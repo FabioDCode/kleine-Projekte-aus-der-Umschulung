@@ -5,6 +5,42 @@
 let draggedBlock = null;
 
 /**
+ * Globale Variable: Aktuelles Level
+ */
+let currentLevel = 0;
+
+/**
+ * Level-Konfiguration
+ * Definiert alle verfügbaren Level mit ihren Blöcken und korrekter Reihenfolge
+ */
+const levels = [
+    {
+        id: 1,
+        name: "Systemwartung",
+        blocks: [
+            { type: "1Step", text: "🔍 Systemstatus prüfen", color: "#4CAF50" },
+            { type: "2Step", text: "▶ Dienst starten", color: "#2196F3" },
+            { type: "3Step", text: "🌐 Netzwerkverbindung testen", color: "#FF9800" },
+            { type: "4Step", text: "❓ Wenn Fehler", color: "#9C27B0" },
+            { type: "5Step", text: "🚨 Fehlermeldung senden", color: "#F44336" }
+        ],
+        correctOrder: ["1Step", "2Step", "3Step", "4Step", "5Step"]
+    },
+    {
+        id: 2,
+        name: "Datenbank-Backup",
+        blocks: [
+            { type: "1Step", text: "💾 Datenbankverbindung prüfen", color: "#4CAF50" },
+            { type: "2Step", text: "📦 Backup erstellen", color: "#2196F3" },
+            { type: "3Step", text: "✅ Backup validieren", color: "#FF9800" },
+            { type: "4Step", text: "❓ Wenn Backup fehlerhaft", color: "#9C27B0" },
+            { type: "5Step", text: "🔄 Backup wiederholen", color: "#F44336" }
+        ],
+        correctOrder: ["1Step", "2Step", "3Step", "4Step", "5Step"]
+    }
+];
+
+/**
  * Event-Listener für Dragstart
  * Wird auf document-Ebene registriert (Event Delegation)
  * Setzt draggedBlock wenn ein Element mit der Klasse 'block' gezogen wird
@@ -38,8 +74,6 @@ document.querySelectorAll('.dropzone').forEach(zone => {
 
         // Szenario 1: Palette → Workspace: kopieren
         if (zone.id === 'workspace' && draggedBlock.parentElement.id === 'palette') {
-            //const clone = draggedBlock.cloneNode(true);
-            //clone.setAttribute('draggable', 'true');
             zone.appendChild(draggedBlock);
             return;
         }
@@ -56,31 +90,18 @@ document.querySelectorAll('.dropzone').forEach(zone => {
 
         // Szenario 3: Innerhalb Workspace neu anordnen
         if (zone.id === 'workspace') {
+            const beforeBlock = getInsertPosition(zone, e.clientY);
 
-        const beforeBlock = getInsertPosition(zone, e.clientY);
+            if (beforeBlock) {
+                zone.insertBefore(draggedBlock, beforeBlock);
+            } else {
+                zone.appendChild(draggedBlock);
+            }
 
-        if (beforeBlock) {
-            zone.insertBefore(draggedBlock, beforeBlock);
-        } else {
-            zone.appendChild(draggedBlock);
-        }
-
-        return;
+            return;
         }
     });
 });
-
-/**
- * Definiert die korrekte Reihenfolge der Blöcke
- * Wird für die Validierung verwendet
- */
-const correctOrder = [
-    "1Step",
-    "2Step",
-    "3Step",
-    "4Step",
-    "5Step"
-];
 
 /**
  * Prüft, ob die Blöcke im angegebenen Container in der korrekten Reihenfolge sind
@@ -88,23 +109,20 @@ const correctOrder = [
  * @returns {boolean} True wenn Anzahl UND Reihenfolge korrekt sind
  */
 function isCorrectOrder(containerId) {
-
     const container = document.getElementById(containerId);
     const blocks = container.querySelectorAll('.block');
-
-    // IF 1: Anzahl prüfen
+    const correctOrder = levels[currentLevel].correctOrder;
+    
     if (blocks.length !== correctOrder.length) {
         return false;
     }
-
-    // IF 2: Reihenfolge prüfen
+    
     for (let i = 0; i < correctOrder.length; i++) {
         if (blocks[i].dataset.type !== correctOrder[i]) {
             return false;
         }
     }
-
-    // ✔ Alles korrekt
+    
     return true;
 }
 
@@ -125,15 +143,12 @@ function getProgramFromWorkspace() {
  * @param {Array<string>} program - Array von Schritt-IDs die ausgeführt werden sollen
  */
 function executeProgram(program) {
-
     let errorOccurred = false;
 
     for (let i = 0; i < program.length; i++) {
-
         const step = program[i];
 
         switch (step) {
-
             case "1Step":
                 console.log("🔍 Systemstatus prüfen");
                 // simuliert: Fehler zufällig
@@ -166,21 +181,40 @@ function executeProgram(program) {
 }
 
 /**
- * Event-Listener für den "Ausführen"-Button
- * Validiert die Anordnung und führt das Programm aus
+ * Initialisiert ein Level
+ * Lädt die Blöcke in die Palette und mischt sie
+ * @param {number} levelIndex - Index des zu ladenden Levels
  */
-document.getElementById('runBtn').addEventListener('click', () => {
-
-    const program = getProgramFromWorkspace();
-    console.log("Programm:", program);
-
-    if (isCorrectOrder("workspace")) {
-        executeProgram(program);
-    } else {
-        alert("❌ Blöcke sind nicht korrekt angeordnet!");
+function initLevel(levelIndex) {
+    const level = levels[levelIndex];
+    const palette = document.getElementById('palette');
+    const workspace = document.getElementById('workspace');
+    
+    // Workspace leeren
+    workspace.innerHTML = '';
+    
+    // Palette leeren und neu befüllen
+    palette.innerHTML = '';
+    
+    level.blocks.forEach(blockData => {
+        const block = document.createElement('div');
+        block.className = 'block';
+        block.setAttribute('draggable', 'true');
+        block.dataset.type = blockData.type;
+        block.textContent = blockData.text;
+        block.style.backgroundColor = blockData.color;
+        palette.appendChild(block);
+    });
+    
+    // Palette mischen
+    shufflePalette();
+    
+    // Level-Titel aktualisieren (wenn vorhanden)
+    const levelTitle = document.getElementById('levelTitle');
+    if (levelTitle) {
+        levelTitle.textContent = `Level ${level.id}: ${level.name}`;
     }
-
-});
+}
 
 /**
  * Berechnet die Einfügeposition für ein gezogenes Element
@@ -223,7 +257,45 @@ function shufflePalette() {
     blocks.forEach(block => palette.appendChild(block));
 }
 
-// Beim Laden der Seite die Palette mischen
-window.addEventListener('DOMContentLoaded', () => {
-    shufflePalette();
+/**
+ * Event-Listener für den "Ausführen"-Button
+ * Validiert die Anordnung und führt das Programm aus
+ */
+document.getElementById('runBtn').addEventListener('click', () => {
+    const program = getProgramFromWorkspace();
+    
+    if (isCorrectOrder("workspace")) {
+        executeProgram(program);
+        
+        // Zum nächsten Level
+        if (currentLevel < levels.length - 1) {
+            setTimeout(() => {
+                if (confirm(`🎉 Level ${currentLevel + 1} geschafft! Weiter zu Level ${currentLevel + 2}?`)) {
+                    currentLevel++;
+                    initLevel(currentLevel);
+                }
+            }, 500);
+        } else {
+            setTimeout(() => {
+                alert("🏆 Glückwunsch! Alle Level geschafft!");
+            }, 500);
+        }
+    } else {
+        alert("❌ Blöcke sind nicht korrekt angeordnet!");
+    }
 });
+
+/**
+ * Initialisierung beim Laden der Seite
+ * Lädt das erste Level
+ */
+window.addEventListener('DOMContentLoaded', () => {
+    initLevel(currentLevel);
+});
+
+
+
+
+
+
+/** ALLE KOMMENTARE WURDE VON DER CLAUDE AI ERSTELLT! */
