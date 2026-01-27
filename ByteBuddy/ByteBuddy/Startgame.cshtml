@@ -1,0 +1,52 @@
+@{
+    ViewBag.Title = "ByteBuddy";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="outer-container">
+    <div class="block-editor">
+
+        <!-- Linke Seite: Block-Palette -->
+        <div id="palette" class="dropzone">
+            <h3>Blöcke</h3>
+
+            <div class="block" draggable="true" data-type="1Step">
+                Systemstatus prüfen
+            </div>
+
+            <div class="block" draggable="true" data-type="2Step">
+                Dienst starten
+            </div>
+
+            <div class="block" draggable="true" data-type="3Step">
+                Netzwerkverbindung testen
+            </div>
+
+            <div class="block" draggable="true" data-type="4Step">
+                Wenn Fehler
+            </div>
+
+            <div class="block" draggable="true" data-type="5Step">
+                Fehlermeldung senden
+            </div>
+        </div>
+
+        <!-- Rechte Seite: Arbeitsfläche -->
+        <div id="workspace" class="dropzone">
+            <h3>Arbeitsfläche</h3>
+        </div>
+
+        <!-- Trash -->
+        <div id="trash" class="dropzone">
+            🗑 Löschen
+        </div>
+
+        <button id="runBtn" class="dropzone" >Prüfen</button>
+
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/js/bytebuddy.js"></script>
+    <link rel="stylesheet" href="~/css/bytebuddy.css">
+}

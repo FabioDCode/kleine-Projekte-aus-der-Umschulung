@@ -1,0 +1,93 @@
+.outer-container {
+    padding-top: 130px;
+    display: flex;
+    justify-content: center; /* horizontal */
+}
+
+.dropzone{
+    box-shadow: 5px 5px 10px rgba(0,0,0,0.5);
+}
+
+.block-editor {
+    display: grid;
+    grid-template-columns: 300px 1fr; /* Palette fix, Workspace flexibel */
+    grid-template-rows: auto 100px; /* Workspace und Trash-Bereich Höhe */
+    gap: 20px;
+    padding: 20px;
+    height: 85vh; /* Editor nimmt gesamten Bildschirm */
+    text-align: center;
+}
+
+/* Palette links */
+#palette {
+    background: #a8a8a8;
+    padding: 10px;
+    border: 3px solid rgb(215, 206, 206);
+    border-radius: 8px;
+    overflow-y: auto; /* Scroll, falls zu viele Blöcke */
+}
+
+/* Workspace rechts */
+#workspace {
+    background: #d9d9d9;
+    padding: 10px;
+    border: 3px solid rgb(191, 191, 191);
+    border-radius: 8px;
+    min-height: 400px; /* Individuell anpassbar */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 80vh;
+}
+
+/* Trash unten rechts */
+#trash {
+    grid-column: 2 / 3; /* unter Workspace */
+    background: #ba2b2a;
+    color: white;
+    border: 3px solid rgb(21, 21, 21);
+    border-radius: 8px;
+    font-size: 30px;
+    width: 80vh;
+    display: flex;
+    justify-content: center; /* horizontal */
+    align-items: center; /* vertikal */
+}
+
+/* Blöcke */
+.block {
+    background: #ba2b2a;
+    color: white;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    cursor: grab;
+    box-shadow: 3px 3px 5px rgba(0,0,0,0.4);
+    text-align: center;
+    font-size: 20px;
+    font-weight: 600;
+    color: white;
+}
+
+/* Prüfen-Button */
+#runBtn {
+    /*grid-area: row-start / column-start / row-end / column-end;*/
+    grid-area: 2 / 1 / 3 / 2;
+    justify-self: center;
+    padding: 10px 20px;
+    background: #308d1a;
+    border-radius: 14px;
+    border: 7px solid #c5fc94;
+    cursor: pointer;
+    width: 250px;
+    text-align: center;
+    font-size: 30px;
+    color: white;
+}
+
+#runBtn:hover {
+    background-color: #c5fc94;
+    border: 7px solid #308d1a;
+    color: black;
+    transform: scale(0.95);
+}

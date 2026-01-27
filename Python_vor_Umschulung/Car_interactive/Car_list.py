@@ -1,0 +1,2 @@
+car_mark     = ['Audi', 'BMW', 'Mercedes', 'VW', 'Ford', 'Porsche', 'Lamborghini']
+car_model   = ['RS3', 'RS6', 'RS7', 'M2', 'M3', 'M5', 'CL63 AMG', 'G-Klasse AMG', 'Golf R', 'GTI', 'Mustang', 'Focus ST', 'Focus RS', 'GT3-RS', '911 Turbo', 'Aventador']
