@@ -3,7 +3,8 @@
  * Wird beim Dragstart gesetzt und bei Drop-Events verwendet
  */
 let draggedBlock = null;
-
+let points = 0;
+const pointsCounterEl = document.querySelector('.pointsCounter');
 /**
  * Globale Variable: Aktuelles Level
  */
@@ -168,7 +169,7 @@ function executeProgram(program) {
                 console.log("❓ Wenn Fehler");
                 // Wenn kein Fehler: überspringt den nächsten Schritt (5Step)
                 if (!errorOccurred) {
-                    alert("RICHTIG!");
+                    showToast("RICHTIG!");
                     i++; // überspringt 5Step
                 }
                 break;
@@ -261,6 +262,7 @@ function shufflePalette() {
  * Event-Listener für den "Ausführen"-Button
  * Validiert die Anordnung und führt das Programm aus
  */
+
 document.getElementById('runBtn').addEventListener('click', () => {
     const program = getProgramFromWorkspace();
     
@@ -271,17 +273,25 @@ document.getElementById('runBtn').addEventListener('click', () => {
         if (currentLevel < levels.length - 1) {
             setTimeout(() => {
                 if (confirm(`🎉 Level ${currentLevel + 1} geschafft! Weiter zu Level ${currentLevel + 2}?`)) {
+                    points++;
                     currentLevel++;
+                    updatePoints();
                     initLevel(currentLevel);
                 }
             }, 500);
         } else {
             setTimeout(() => {
-                alert("🏆 Glückwunsch! Alle Level geschafft!");
+                points++;
+                updatePoints();
+                showToast("🏆 Glückwunsch! Alle Level geschafft!");
+
+                setTimeout (() => {
+                    window.location.href = mainViewUrl;
+                }, 5000); // 5 Sekunden
             }, 500);
         }
     } else {
-        alert("❌ Blöcke sind nicht korrekt angeordnet!");
+        showToast("❌ Blöcke sind nicht korrekt angeordnet!");
     }
 });
 
@@ -291,11 +301,39 @@ document.getElementById('runBtn').addEventListener('click', () => {
  */
 window.addEventListener('DOMContentLoaded', () => {
     initLevel(currentLevel);
+    updatePoints();
 });
 
+function updatePoints (){
+    pointsCounterEl.textContent = points;
+}
+/**--------------------------------------------------------------------------------------- */
 
-
-
-
-
-/** ALLE KOMMENTARE WURDE VON DER CLAUDE AI ERSTELLT! */
+/**
+ * Zeigt eine einfache Toast-Benachrichtigung an
+ * @param {string} message - Die Nachricht
+ * @param {string} type - Typ: 'success', 'error', 'info', 'warning' (Standard: 'info')
+ * @param {number} duration - Anzeigedauer in ms (Standard: 3000)
+ */
+function showToast(message, type = 'info', duration = 3000) {
+    // Erstelle Toast-Element
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    
+    // Füge zum Body hinzu
+    document.body.appendChild(toast);
+    
+    // Zeige Toast an
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 10);
+    
+    // Entferne Toast nach Dauer
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            document.body.removeChild(toast);
+        }, 300);
+    }, duration);
+}

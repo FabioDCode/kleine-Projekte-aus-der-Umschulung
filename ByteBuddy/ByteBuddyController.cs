@@ -10,5 +10,10 @@ namespace Bestes_Robo_Figma_Projekt.Controllers
         {
             return View();
         }
+
+        public IActionResult ToMain()
+        {
+            return RedirectToAction("Home", "NAV_View3");
+        }
     }
 }
